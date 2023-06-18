@@ -32,5 +32,5 @@ UPD 18/06/2023
 
 
 
-[Ссылка на проект](https://l1qwy.github.io/mesto/)
+[Ссылка на проект](https://l1qwy.github.io/mesto-react/)
 
