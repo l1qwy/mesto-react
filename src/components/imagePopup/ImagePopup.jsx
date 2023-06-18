@@ -1,5 +1,5 @@
 import React from "react";
-export default function PopupImage({ card, onOpen, onClose }) {
+export default function ImagePopup({ card, onOpen, onClose }) {
   return (
     <section className={`popup popup_scale-img ${onOpen && 'popup_open'}`}>
       <figure className="popup__scale-container">

@@ -3,7 +3,7 @@ import Footer from './footer/Footer.jsx';
 import Header from './header/Header.jsx';
 import Main from './main/Main.jsx';
 import PopupWithForm from "./popupWithForm/PopupWithForm.jsx";
-import PopupImage from "./popupImage/PopupImage.jsx";
+import ImagePopup from "./imagePopup/ImagePopup.jsx";
 
 function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
@@ -148,7 +148,7 @@ function App() {
         onClose = {closeAllPopups}
       />
 
-      <PopupImage
+      <ImagePopup
         card = {selectedCard}
         onOpen = {selectedCard}
         onClose = {closeAllPopups}
