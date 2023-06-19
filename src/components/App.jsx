@@ -10,8 +10,9 @@ function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false)
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false)
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false)
-  const [selectedCard, setSelectedCard] = useState(false)
-
+  const [selectedCard, setSelectedCard] = useState({})
+  const [isScaleImage, setIsScaleImage] = useState(false)
+  
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true)
   }
@@ -30,6 +31,7 @@ function App() {
 
   function handleCardClick(card) {
     setSelectedCard(card)
+    setIsScaleImage(true)
   }
 
   function closeAllPopups() {
@@ -37,7 +39,7 @@ function App() {
     setIsEditProfilePopupOpen(false)
     setIsAddPlacePopupOpen(false)
     setIsDeletePopupOpen(false)
-    setSelectedCard(false)
+    setIsScaleImage(false)
   }
 
   return (
@@ -150,7 +152,7 @@ function App() {
 
       <ImagePopup
         card = {selectedCard}
-        onOpen = {selectedCard}
+        onOpen = {isScaleImage}
         onClose = {closeAllPopups}
       />
     </div>

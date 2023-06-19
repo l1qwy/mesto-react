@@ -4,6 +4,7 @@
   max-width: 1280px;
   padding-top: 45px;
   padding-bottom: 60px;
+  min-height: 100vh;
   padding-right: calc( (100vw - 320px)/(1280 - 320) * (200 - 0) + 0px);
   padding-left: calc( (100vw - 320px)/(1280 - 320) * (200 - 0) + 0px);
 }
