@@ -17,7 +17,7 @@ export default function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardCl
         cardsInfo.forEach(item =>
           item.myId = userInfo._id)
         setCards(cardsInfo)
-      }) .catch((error => console.error('Ошибка при формировании страницы ' + error)));
+      }).catch((error => console.error('Ошибка при формировании страницы ' + error)));
   }, [])
 
   return (
