@@ -56,30 +56,6 @@ function App() {
     setIsScaleImage(true);
   }
 
-  function handleUpdateUser(input, reset) {
-    api
-      .setUserInfoToSrv(input)
-      .then((res) => {
-        setCurrentUser(res);
-        closeAllPopups();
-        reset();
-      })
-      .catch((error) =>
-        console.error("Ошибка сохранения введенных данных" + error)
-      );
-  }
-
-  function handleUpdateAvatar(input, reset) {
-    api
-      .changeAvatar(input)
-      .then((res) => {
-        setCurrentUser(res);
-        closeAllPopups();
-        reset();
-      })
-      .catch((error) => console.error("Ошибка обновления аватара " + error));
-  }
-
   useEffect(() => {
     Promise.all([api.getUserInfoFromSrv(), api.getServerCards()])
       .then(([userInfo, cardsInfo]) => {
@@ -90,6 +66,32 @@ function App() {
         console.error("Ошибка при формировании страницы " + error)
       );
   }, []);
+
+  function handleUpdateUser(input, reset) {
+    api
+      .setUserInfoToSrv(input)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+        reset();
+      })
+      .catch((error) =>
+        console.error("Ошибка сохранения введенных данных" + error)
+      )
+      .finally(() => reset(false));
+  }
+
+  function handleUpdateAvatar(input, reset) {
+    api
+      .changeAvatar(input)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+        reset();
+      })
+      .catch((error) => console.error("Ошибка обновления аватара " + error))
+      .finally(() => reset(false));
+  }
 
   function handleCardDelete(event) {
     event.preventDefault();
@@ -114,7 +116,8 @@ function App() {
         closeAllPopups();
         reset();
       })
-      .catch((error) => console.error("Ошибка добавления карточки " + error));
+      .catch((error) => console.error("Ошибка добавления карточки " + error))
+      .finally(() => reset(false));
   }
 
   const closePopupByEsc = useCallback(
