@@ -1,24 +1,20 @@
-import React, { useEffect, useState } from "react";
-import api from "../../utils/Api.js";
+import React, { useContext } from "react";
 import Card from "../card/Card.jsx";
+import CurrentUserContext from "../contexts/CurrentUserContext.js";
 
-export default function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardClick, onDeletePlace }) {
-  const [userName, setUserName] = useState('')
-  const [userDescription , setUserDescription ] = useState('')
-  const [userAvatar, setUserAvatar] = useState('')
-  const [cards, setCards] = useState([])
+export default function Main({
+  onEditAvatar,
+  onEditProfile,
+  onAddPlace,
+  onCardClick,
+  onDeletePlace,
+  cards,
+}) {
+  const currentUser = useContext(CurrentUserContext);
 
-  useEffect(() => {
-    Promise.all([api.getUserInfoFromSrv(), api.getServerCards()])
-      .then(([userInfo, cardsInfo]) => {
-        setUserName(userInfo.name)
-        setUserDescription(userInfo.about)
-        setUserAvatar(userInfo.avatar)
-        cardsInfo.forEach(item =>
-          item.myId = userInfo._id)
-        setCards(cardsInfo)
-      }).catch((error => console.error('Ошибка при формировании страницы ' + error)));
-  }, [])
+  // const [userName, setUserName] = useState('')
+  // const [userDescription , setUserDescription ] = useState('')
+  // const [userAvatar, setUserAvatar] = useState('')
 
   return (
     <main>
@@ -31,16 +27,20 @@ export default function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardCl
         >
           <img
             className="profile__avatar"
-            src={userAvatar}
-            style={{ backgroundImage: `url(${userAvatar})` }}
+            src={currentUser.avatar}
+            style={{ backgroundImage: `url(${currentUser.avatar})` }}
             alt="Здесь должно быть изображение Вашего профиля"
             name="avatarProfile"
           />
         </button>
 
         <div className="profile__info">
-          <h1 className="profile__name" id="name" >{userName}</h1>
-          <p className="profile__description" id="job" >{userDescription}</p>
+          <h1 className="profile__name" id="name">
+            {currentUser.name}
+          </h1>
+          <p className="profile__description" id="job">
+            {currentUser.about}
+          </p>
         </div>
 
         <button
@@ -49,24 +49,25 @@ export default function Main({ onEditAvatar, onEditProfile, onAddPlace, onCardCl
           aria-label="edit-profile-button"
           onClick={onEditProfile}
         />
-        
+
         <button
           className="profile__add-item-button"
           type="button"
           aria-label="add-item-galery"
-          onClick = {onAddPlace}
+          onClick={onAddPlace}
         />
       </section>
       <section className="galery">
-        {cards.map(data => {
-          return(
-            <article key = {data._id}>
-              <Card cards = {data}
-              onCardClick = {onCardClick}
-              onDeletePlace = {onDeletePlace}
+        {cards.map((data) => {
+          return (
+            <article key={data._id}>
+              <Card
+                cards={data}
+                onCardClick={onCardClick}
+                onDeletePlace={onDeletePlace}
               />
             </article>
-          )
+          );
         })}
       </section>
     </main>
