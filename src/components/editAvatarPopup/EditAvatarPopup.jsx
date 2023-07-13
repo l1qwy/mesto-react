@@ -13,7 +13,7 @@ export default function EditAvatarPopup({ onOpen, onClose, onUpdateAvatar }) {
     reset,
   } = useFormValidation();
 
-  function formReset() {
+  function resetForm() {
     onClose();
     reset();
   }
@@ -29,7 +29,7 @@ export default function EditAvatarPopup({ onOpen, onClose, onUpdateAvatar }) {
       title="Обновить аватар"
       textButton="Сохранить"
       onOpen={onOpen}
-      onClose={formReset}
+      onClose={resetForm}
       isValid={isValid}
       onSubmit={handleSubmit}
     >

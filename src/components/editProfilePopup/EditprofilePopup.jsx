@@ -20,7 +20,7 @@ export default function EditProfilePopup({ onOpen, onClose, onUpdateUser }) {
     setValue("jobProfile", currentUser.about);
   }, [currentUser, setValue]);
 
-  function formReset() {
+  function resetForm() {
     onClose();
     reset({ nameProfile: currentUser.name, jobProfile: currentUser.about });
   }
@@ -42,7 +42,7 @@ export default function EditProfilePopup({ onOpen, onClose, onUpdateUser }) {
       title="Редактировать профиль"
       textButton="Сохранить"
       onOpen={onOpen}
-      onClose={formReset}
+      onClose={resetForm}
       isValid={isValid}
       onSubmit={handleSubmit}
     >

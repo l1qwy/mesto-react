@@ -11,7 +11,7 @@ export default function AddPlacePopup({ onOpen, onClose, onAddPlace }) {
     reset,
   } = useFormValidation();
 
-  function formReset() {
+  function resetForm() {
     onClose();
     reset();
   }
@@ -27,7 +27,7 @@ export default function AddPlacePopup({ onOpen, onClose, onAddPlace }) {
       title="Новое место"
       textButton="Создать"
       onOpen={onOpen}
-      onClose={formReset}
+      onClose={resetForm}
       isValid={isValid}
       onSubmit={handleSubmit}
     >
