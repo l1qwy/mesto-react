@@ -1,25 +1,34 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Footer from "./footer/Footer.jsx";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import { autorization, registration, getUserData } from "../utils/auth.js";
 import Header from "./header/Header.jsx";
 import Main from "./main/Main.jsx";
 import EditProfilePopup from "./editProfilePopup/EditprofilePopup.jsx";
-import PopupWithForm from "./popupWithForm/PopupWithForm.jsx";
 import ImagePopup from "./imagePopup/ImagePopup.jsx";
 import CurrentUserContext from "./contexts/CurrentUserContext.js";
 import api from "../utils/Api.js";
 import EditAvatarPopup from "./editAvatarPopup/EditAvatarPopup.jsx";
 import AddPlacePopup from "./addPlacePopup/AddPlacePopup.jsx";
+import DeleteCardPopup from "./deleteCardPopup/DeleteCardPopup.jsx";
+import ProtectedHome from "./protectedHome/ProtectedHome.jsx";
+import ProtectedRoute from "./protectedRoute/ProtectedRoute.jsx";
+import InfoTooltip from "./infoTooltip/InfoTooltip.jsx";
 
 function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isDeletePlacePopupOpen, setIsDeletePlacePopupOpen] = useState(false);
+  const [isResultLoginPopupOpen, setIsResultLoginPopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
   const [isScaleImage, setIsScaleImage] = useState(false);
   const [currentUser, setCurrentUser] = useState([]);
+  const [userEmail, setUserEmail] = useState("");
   const [cards, setCards] = useState([]);
   const [deleteCard, setDeleteCard] = useState("");
+  const [isSuccessfully, setIsSuccessfully] = useState(true);
+  const [isLogged, setIsLogged] = useState(false);
+  const navigate = useNavigate();
 
   const closeAllPopups = useCallback(() => {
     setIsEditAvatarPopupOpen(false);
@@ -27,6 +36,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsDeletePlacePopupOpen(false);
     setIsScaleImage(false);
+    setIsResultLoginPopupOpen(false);
   }, []);
 
   function handleEditAvatarClick() {
@@ -57,15 +67,32 @@ function App() {
   }
 
   useEffect(() => {
-    Promise.all([api.getUserInfoFromSrv(), api.getServerCards()])
-      .then(([userInfo, cardsInfo]) => {
-        setCurrentUser(userInfo);
-        setCards(cardsInfo);
-      })
-      .catch((error) =>
-        console.error("Ошибка при формировании страницы " + error)
-      );
-  }, []);
+    if (isLogged) {
+      Promise.all([api.getUserInfoFromSrv(), api.getServerCards()])
+        .then(([userInfo, cardsInfo]) => {
+          setCurrentUser(userInfo);
+          setCards(cardsInfo);
+        })
+        .catch((error) =>
+          console.error("Ошибка при формировании страницы " + error)
+        );
+    }
+  }, [isLogged]);
+
+  useEffect(() => {
+    if (localStorage.jwt) {
+      getUserData(localStorage.jwt)
+        .then((res) => {
+          console.log(res)
+          setUserEmail(res.data.email);
+          setIsLogged(true);
+          navigate("/");
+        })
+        .catch((error) => console.error(`Ошибка данных авторизации ${error}`));
+    } else {
+      setIsLogged(false);
+    }
+  }, [navigate]);
 
   function handleUpdateUser(input, reset) {
     api
@@ -93,8 +120,7 @@ function App() {
       .finally(() => reset(false));
   }
 
-  function handleCardDelete(event) {
-    event.preventDefault();
+  function handleCardDelete() {
     api
       .deleteCardFromSrv(deleteCard)
       .then(() => {
@@ -139,19 +165,73 @@ function App() {
     document.addEventListener("keydown", closePopupByEsc);
   }
 
+  function handleRegister(password, email) {
+    registration(password, email)
+      .then(() => {
+        setIsResultLoginPopupOpen(true);
+        setIsSuccessfully(true);
+        navigate("/sign-in");
+      })
+      .catch((error) => {
+        setIsResultLoginPopupOpen(true);
+        setIsSuccessfully(false);
+        console.error(`Ошибка регистрации ${error}`);
+      })
+  }
+
+  function handleLogin(password, email) {
+    autorization(password, email)
+      .then((res) => {
+        localStorage.setItem("jwt", res.token);
+        setIsLogged(true);
+        navigate("/");
+      })
+      .catch((error) => {
+        setIsResultLoginPopupOpen(true);
+        setIsSuccessfully(false);
+        console.error(`Ошибка входа ${error}`);
+      });
+  }
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header />
-        <Main
-          onEditProfile={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
-          onEditAvatar={handleEditAvatarClick}
-          onDeletePlace={handleDeletePlaceClick}
-          onCardClick={handleCardClick}
-          cards={cards}
-        />
-        <Footer />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute
+                element={ProtectedHome}
+                onEditProfile={handleEditProfileClick}
+                onAddPlace={handleAddPlaceClick}
+                onEditAvatar={handleEditAvatarClick}
+                onDeletePlace={handleDeletePlaceClick}
+                onCardClick={handleCardClick}
+                cards={cards}
+                userEmail={userEmail}
+                inLogged={isLogged}
+              />
+            }
+          />
+          <Route
+            path="/sign-up"
+            element={
+              <>
+                <Header name="signUp" />
+                <Main name="signUp" onRegister={handleRegister} />
+              </>
+            }
+          />
+          <Route
+            path="/sign-in"
+            element={
+              <>
+                <Header name="signIn" />
+                <Main name="signIn" onLogin={handleLogin} />
+              </>
+            }
+          />
+        </Routes>
 
         <EditProfilePopup
           onOpen={isEditProfilePopupOpen}
@@ -171,20 +251,22 @@ function App() {
           onClose={closePopupByOverlay}
         />
 
-        <PopupWithForm
-          name="delete-item"
-          // тайтлы если изменить то нужно менять и в попапВитФорм, решить как уйти от этого. То же самое текстБуттон
-          title="Вы уверены ?"
-          textButton="Да"
+        <DeleteCardPopup
           onOpen={isDeletePlacePopupOpen}
-          isValid={true}
           onClose={closePopupByOverlay}
-          onSubmit={handleCardDelete}
+          onDeleteCard={handleCardDelete}
         />
 
         <ImagePopup
           card={selectedCard}
           onOpen={isScaleImage}
+          onClose={closePopupByOverlay}
+        />
+
+        <InfoTooltip
+          name="result"
+          onOpen={isResultLoginPopupOpen}
+          isSuccessfully={isSuccessfully}
           onClose={closePopupByOverlay}
         />
       </div>

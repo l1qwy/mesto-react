@@ -1,4 +1,5 @@
 import React from "react";
+import Form from "../form/Form";
 
 export default function PopupWithForm({
   title,
@@ -11,6 +12,7 @@ export default function PopupWithForm({
   isValid,
 }) {
   return (
+
     <section
       className={`popup popup_type_${name} ${onOpen && "popup_open"}`}
       onClick={onClose}
@@ -18,7 +20,7 @@ export default function PopupWithForm({
       <div
         className={`popup__container ${
           name === "delete-item" && "popup__container_delete"
-        }`}
+        } ${name === "result" && "popup__container_reg"}`}
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -27,14 +29,17 @@ export default function PopupWithForm({
           aria-label="close-popup"
           onClick={onClose}
         />
-        <form
-          name={name}
-          noValidate
-          onSubmit={onSubmit}
-        >
+        <Form 
+        name={name}
+        title={title}
+        textButton={textButton}
+        children={children}
+        onSubmit={onSubmit}
+        isValid={isValid}/>
+        {/* <form name={name} noValidate onSubmit={onSubmit}>
           <h3
             className={`form__title ${
-              title === "Вы уверены ?" && "form__title_delete"
+              title === {name} && "form__title_delete"
             }`}
           >
             {title}
@@ -48,7 +53,7 @@ export default function PopupWithForm({
           >
             {textButton}
           </button>
-        </form>
+        </form> */}
       </div>
     </section>
   );
