@@ -5,6 +5,8 @@
   border-color: rgb(84, 84, 84, 0.7);
   margin-bottom: 40px;
   display: block;
+  justify-content: space-between;
+  display: flex;
 }
 
 @media (max-width: 768px) {
